@@ -9,18 +9,19 @@ std::vector<int> tris, solids;
 return 0;
 }
 
-float[] parse_stl(string name, std::vector &coords,std::vector &normals,std::vector &tris,std::vector &solids)
+void parse_stl(string name, std::vector &coords,std::vector &normals,std::vector &tris,std::vector &solids)
 {
 	std::fstream my_file;
-	my_file.open(name, ios::in);
-	std::string linestr;
+	my_file.open(name, ios::in | ios::binary);
 	if (!my_file){
 		std::cout<< "No such file"<<std::endl;
+		exit("fail");
 	}
-	else{
-		while(1){
-		
-		}
+	try {
+		uint32 x = num_of_tris;
+		my_file.seekp(80,ios::beg);
+		my_file.read()
+
 	}
 }
 
