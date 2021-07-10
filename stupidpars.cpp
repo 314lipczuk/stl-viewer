@@ -2,26 +2,48 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <regex>
+bool isAscii(std::fstream &my_file);
+void parseAscii(std::string &name, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids,std::fstream &my_file);
+void parseBinary(std::string &name, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids,std::fstream &my_file);
 
-int main(){
-std::vector<float> coords, normals;
-std::vector<int> tris, solids;
-return 0;
-}
-
-void parse_stl(string name, std::vector &coords,std::vector &normals,std::vector &tris,std::vector &solids)
+void parse_stl(std::string name, std::vector<float> coords,std::vector<float> normals,std::vector<int> tris,std::vector<int> solids)
 {
 	std::fstream my_file;
-	my_file.open(name, ios::in | ios::binary);
+	my_file.open(name, std::ios::binary | std::ios::in);
 	if (!my_file){
-		std::cout<< "No such file"<<std::endl;
-		exit("fail");
+		std::cout<< "File fail"<<std::endl;
 	}
-	try {
-		uint32 x = num_of_tris;
-		my_file.seekp(80,ios::beg);
-		my_file.read()
-
+	if(isAscii(my_file)){
+	std::cout<< "Parsing ascii file" <<std::endl;
+	}else{
+	std::cout<< "Parsing binary file" <<std::endl;
 	}
 }
 
+void parseAscii(std::string &name, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids , std::fstream &my_file){
+	while(1){
+	
+	}	
+}
+bool isAscii(std::fstream &my_file){
+	try{
+		std::string line;
+		std::getline(my_file, line);
+		if( std::regex_match(line, std::regex("(.*)(solid)(.*)")))
+			return true;
+		return false;
+	}
+	catch(...)
+	{
+	std::cout<<"regex fuckup"<<std::endl;
+	}
+}
+
+int main(){
+	std::vector<float> coords, normals;
+	std::vector<int> tris, solids;
+	parse_stl("basic.stl", coords, normals, tris, solids);
+	return 0;
+}
