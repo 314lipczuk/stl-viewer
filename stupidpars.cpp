@@ -4,10 +4,24 @@
 #include <iostream>
 #include <vector>
 #include <regex>
-bool isAscii(std::fstream &my_file);
-void parseLine(std::string &line, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids );
-//void parseBinary(std::string &name, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids,std::fstream &my_file);
+/*
+===TODO===
+*parsing binary
+*parseline func with tri struct
+*/
 
+bool isAscii(std::fstream &my_file);
+void parseLine(std::string &line, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids, tri &curtri );
+
+struct tri{
+	float[3] norm;
+	float[3][3] points; 
+	bool is_viable_tri();
+	tri(float[3] norm);
+	~tri();
+
+
+};
 void parse_stl(std::string name, std::vector<float> coords,std::vector<float> normals,std::vector<int> tris,std::vector<int> solids)
 {
 	std::fstream my_file;
@@ -18,9 +32,10 @@ void parse_stl(std::string name, std::vector<float> coords,std::vector<float> no
 	if(isAscii(my_file)){
 		std::cout<< "Parsing ascii file" <<std::endl;
 		std::string line;
+		tri curtri;
 		while (std::getline(my_file, line)){
-		std::cout<<line<<std::endl;
-		parseLine(&line, &coords, &normals, &tris, &solids);
+			std::cout<<line<<std::endl;
+			parseLine(&line, &coords, &normals, &tris, &solids, &curtri);
 		}
 	}else{
 	std::cout<< "Parsing binary file" <<std::endl;
