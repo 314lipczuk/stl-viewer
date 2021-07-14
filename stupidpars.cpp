@@ -20,7 +20,6 @@ struct tri{
 	tri(float[3] norm);
 	~tri();
 
-
 };
 void parse_stl(std::string name, std::vector<float> coords,std::vector<float> normals,std::vector<int> tris,std::vector<int> solids)
 {
@@ -44,7 +43,16 @@ void parse_stl(std::string name, std::vector<float> coords,std::vector<float> no
 }
 void parseLine(std::string &line,std::string &name, std::vector<float> &coords,std::vector<float> &normals,std::vector<int> &tris,std::vector<int> &solids ){
 	if( std::regex_match( line, std::regex("(*)(normal)(*)"))){
-		std::cout<<"normal"<<std::endl;	
+		std::string pline = "";
+		std::cout<<"normal "<<line<<std::endl;
+		for(char& c:line){
+			if(std::isdigit(c) || std::isspace(c) ){
+				pline.append(c);
+			}
+		}
+		pline.split()
+		curtri = new triangle()
+
 	}
 	if( std::regex_match( line, std::regex("(*)(vertex)(*)"))){
 		std::cout<<""<<std::endl;	
