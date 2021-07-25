@@ -9,6 +9,7 @@
 *parsing binary
 *parseline func with tri struct
 */
+namespace stupidpars{
 bool isAscii(std::fstream &my_file);
 void parseLine(std::string &line, std::vector<float>& coords,int& tris){
   std::regex rg("(facet)(.*)");
@@ -66,9 +67,4 @@ bool isAscii(std::fstream &my_file){
 	std::cout<<"regex fuckup"<<std::endl;
 	}
 }
-int main(){
-	std::vector<float> coords;
-  int tris=0;
-	parse_stl("acube.stl", coords, tris);
-	return 0;
 }

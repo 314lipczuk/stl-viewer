@@ -8,6 +8,7 @@
 //#include "stl_reader.h"
 #include <csignal>
 #include <fstream>
+#include "stupidpars.h"
 /* 
 Sources for:
 -understanding math behind rotations of points and mapping 3D to 2D: https://www.a1k0n.net/2011/07/20/donut-math.html and https://www.a1k0n.net/2021/01/13/optimizing-donut.html
@@ -21,9 +22,28 @@ struct point{
     float z;
     void rotate(int axisVar, float degrees);
     point(float x, float y, float z);
-static std::vector<point*> all_points;
+    static bool alreadyExists(float x, float y, float z);
+    static point& find(float x, float y, float z);
+    static std::vector<point*> all_points;
     };
 std::vector<point*> point::all_points;
+
+point& point::find(float x, float y, float z){
+  for(int p=0;p<all_points.size();p++){
+    if(all_points[p]->x == x &&all_points[p]->y == y && all_points[p]->z == z){
+              return *all_points[p];
+          }
+      }
+  }
+
+bool point::alreadyExists(float x, float y, float z){
+    for(int p=0;p<all_points.size();p++){
+        if(all_points[p]->x == x &&all_points[p]->y == y && all_points[p]->z == z){
+            return true;
+        }
+    }
+    return false;
+}
 void point::rotate(int axisVar, float degrees)
     {
     double cos = std::cos(degrees);
@@ -219,29 +239,30 @@ void buffer::plotline(line l){
     this->plotline(*(l.p1),*(l.p2));
     }
 
-void loadStl(int v=0){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
+void loadStl(){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
+        std::vector<float> coords;
+        int tris;
+        stupidpars::parse_stl("acube.stl", coords, tris);
+        for(int i=0;i<tris;i++){
+          point *pts[3];
+          for(int j=0;j<3;j++){ //corners
+             if(point::alreadyExists(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2])){
+                 pts[j] = &(point::find(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2]));
+             }else{
+                 pts[j] = new Engine::point(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2]);
+             }
+        }
+          /* Version for SFML, with triangle class;
+        new triangle(pts[0],pts[1],pts[2]);
+        */
+        //version without triangle class, for barebones ascii
+        new line(pts[0],pts[1]);
+        new line(pts[0],pts[2]);
+        new line(pts[1],pts[2]);
 
-        std::vector<float> coords, normals;
-        std::vector<unsigned int> tris, solids;
-        try {
-            /*
-            switch (v){
-                case 0:
-                    stl_reader::ReadStlFile ("file.stl", coords, normals, tris, solids);
-                 break;
-                case 1:
-                    stl_reader::ReadStlFile ("taurus.stl", coords, normals, tris, solids);
-                    break;
-                case 2:
-                    stl_reader::ReadStlFile ("pyramid.stl", coords, normals, tris, solids);
-                    break;
-                case 3:
-                    stl_reader::ReadStlFile ("cube.stl", coords, normals, tris, solids);
-                    break;
-                case 4:
-                    stl_reader::ReadStlFile ("basic.stl", coords, normals, tris, solids);
-            }
-            */
+        }
+}
+        /*
           const size_t numTris = tris.size() / 3;
           for(int itri = 0; itri < numTris; ++itri) {
             for(int icorner = 0; icorner < 3; ++icorner) {
@@ -258,6 +279,7 @@ void loadStl(int v=0){ //using external library to parse STL file into my own po
           std::cout << e.what() << std::endl;
         }
     }
+    */
 
 void centerShape(){
     float averagex,averagey,averagez;
