@@ -44,8 +44,7 @@ bool point::alreadyExists(float x, float y, float z){
     }
     return false;
 }
-void point::rotate(int axisVar, float degrees)
-    {
+void point::rotate(int axisVar, float degrees){
     double cos = std::cos(degrees);
     double sin= std::sin(degrees);
     float x = this->x;
@@ -64,7 +63,7 @@ void point::rotate(int axisVar, float degrees)
             this->z = (z*cos) - (y*sin);
             this->y = (z*sin) + (y*cos);
             break;
-    }
+      }
     }
 point::point(float x, float y, float z){
    this->x=x; 
@@ -239,10 +238,10 @@ void buffer::plotline(line l){
     this->plotline(*(l.p1),*(l.p2));
     }
 
-void loadStl(){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
+void loadStl(std::string name){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
         std::vector<float> coords;
         int tris;
-        stupidpars::parse_stl("acube.stl", coords, tris);
+        stupidpars::parse_stl(name, coords, tris);
         for(int i=0;i<tris;i++){
           point *pts[3];
           for(int j=0;j<3;j++){ //corners
