@@ -9,17 +9,17 @@ int main(){//Every run of this shows a random model out of 4 : taurus, cube, tet
     using namespace Engine;
     Engine::buffer b(150,70);
     loadStl("acube.stl");
-    centerShape();
+    //centerShape();
     resizeForBuffer(b.offsety);
     bool tooBigForLines = false;
     if(Engine::point::all_points.size()>500) tooBigForLines = true;
     for(;;){ // If nothing shows you might want to start it again, it does that sometimes
       b.clear();
-      /*
+
       for(int x=0;x<line::all_lines.size();x++){
           b.plotline(*line::all_lines[x]);
       }
-      */
+      
     if(tooBigForLines){
       for(int x=0;x<point::all_points.size();x++){
           b.plot((*point::all_points[x]));

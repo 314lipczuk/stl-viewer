@@ -16,19 +16,20 @@ Sources for:
 - header file that parses STL files into points and lines: https://github.com/sreiter/stl_reader
 */
 namespace Engine{
+using Clock = std::chrono::steady_clock;
 struct point{
-    float x;
-    float y;
-    float z;
-    void rotate(int axisVar, float degrees);
-    point(float x, float y, float z);
-    static bool alreadyExists(float x, float y, float z);
-    static point& find(float x, float y, float z);
+    double x;
+    double y;
+    double z;
+    void rotate(int axisVar, double degrees);
+    point(double x, double y, double z);
+    static bool alreadyExists(double x, double y, double z);
+    static point& find(double x, double y, double z);
     static std::vector<point*> all_points;
     };
 std::vector<point*> point::all_points;
 
-point& point::find(float x, float y, float z){
+point& point::find(double x, double y, double z){
   for(int p=0;p<all_points.size();p++){
     if(all_points[p]->x == x &&all_points[p]->y == y && all_points[p]->z == z){
               return *all_points[p];
@@ -36,7 +37,7 @@ point& point::find(float x, float y, float z){
       }
   }
 
-bool point::alreadyExists(float x, float y, float z){
+bool point::alreadyExists(double x, double y, double z){
     for(int p=0;p<all_points.size();p++){
         if(all_points[p]->x == x &&all_points[p]->y == y && all_points[p]->z == z){
             return true;
@@ -44,12 +45,12 @@ bool point::alreadyExists(float x, float y, float z){
     }
     return false;
 }
-void point::rotate(int axisVar, float degrees){
+void point::rotate(int axisVar, double degrees){
     double cos = std::cos(degrees);
     double sin= std::sin(degrees);
-    float x = this->x;
-    float y = this->y;
-    float z = this->z;
+    double x = this->x;
+    double y = this->y;
+    double z = this->z;
     switch(axisVar){
         case 1: // Clockwise rotation around Z axis
             this->x = (x * cos) - (y*sin);       
@@ -65,7 +66,7 @@ void point::rotate(int axisVar, float degrees){
             break;
       }
     }
-point::point(float x, float y, float z){
+point::point(double x, double y, double z){
    this->x=x; 
    this->y=y; 
    this->z=z; 
@@ -74,14 +75,14 @@ point::point(float x, float y, float z){
 struct line{
     point* p1;
     point* p2;
-    float normx,normy,normz;
+    double normx,normy,normz;
     line(point* p1, point* p2);
-    line(point* p1, point* p2,float nx,float ny, float nz);
+    line(point* p1, point* p2,double nx,double ny, double nz);
     static std::vector<line*> all_lines;
     void draw_all();
     };
 
- line::line(point* p1, point* p2,float nx,float ny, float nz){
+ line::line(point* p1, point* p2,double nx,double ny, double nz){
 
     this->p1 = p1;
     this->p2 = p2;
@@ -176,7 +177,7 @@ void buffer::plot(point p)
 
 void buffer::plotline(point p1, point p2)
     { 
-        float deltax,deltay;
+        double deltax,deltay;
         if(p1.x>p2.x){
             point tmp = p1;
             p1 = p2;
@@ -199,9 +200,9 @@ void buffer::plotline(point p1, point p2)
 		    return;
 	       }
 
-	    float delta_error = deltay / deltax;
+	    double delta_error = deltay / deltax;
 	    if (delta_error < 0) delta_error = -delta_error;
-	    float error = 0;
+	    double error = 0;
         if(delta_error<1){
 	    int y = p1.y;
 	    for (int x = p1.x; x <= p2.x; ++x)
@@ -239,7 +240,8 @@ void buffer::plotline(line l){
     }
 
 void loadStl(std::string name){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
-        std::vector<float> coords;
+        std::vector<double> coords;
+	auto tic = Clock::now();
         int tris;
         stupidpars::parse_stl(name, coords, tris);
         for(int i=0;i<tris;i++){
@@ -260,12 +262,14 @@ void loadStl(std::string name){ //using external library to parse STL file into 
         new line(pts[1],pts[2]);
 
         }
+	auto toc= Clock::now();
+	std::cout << "Engine.h -> load_stl() 	Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic).count() << std::endl;
 }
         /*
           const size_t numTris = tris.size() / 3;
           for(int itri = 0; itri < numTris; ++itri) {
             for(int icorner = 0; icorner < 3; ++icorner) {
-                float* c = &coords[3 * tris [3 * itri + icorner]];
+                double* c = &coords[3 * tris [3 * itri + icorner]];
                 new point(c[0],c[1],c[2]);
             }
             std::vector<point*>::iterator itr = point::all_points.end();
@@ -281,7 +285,7 @@ void loadStl(std::string name){ //using external library to parse STL file into 
     */
 
 void centerShape(){
-    float averagex,averagey,averagez;
+    double averagex,averagey,averagez;
     for(int i=0;i<point::all_points.size();i++){
         averagex+=point::all_points[i]->x;
         averagey+=point::all_points[i]->y;
@@ -298,7 +302,7 @@ void centerShape(){
     }
 }
 
-void scaleShape(float s_factor){
+void scaleShape(double s_factor){
     for(int i=0;i<point::all_points.size();i++){
        point::all_points[i]->x = point::all_points[i]->x * s_factor;
        point::all_points[i]->y = point::all_points[i]->y * s_factor;
@@ -325,7 +329,7 @@ void clearMem(){
     line::all_lines.clear();
     point::all_points.clear();
 }
-
+/*
 void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 hours before project end so its a bit of a hack, not sure if makes any sense and not sure if works
     std::cout<<"Taking a screenshot!";
     std::ofstream screenshot;
@@ -350,5 +354,5 @@ void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 ho
     exit(num);
     }
 
-    
+  */  
 }
