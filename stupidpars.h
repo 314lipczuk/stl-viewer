@@ -50,7 +50,8 @@ void parse_stl(std::string name, std::vector<double> &coords, int& tris)
 		std::cout<< "File fail"<<std::endl;
 	}
 	if(isAscii(my_file)){
-		std::cout<< "Parsing ascii file" <<std::endl; std::string line;
+		std::cout<< "Parsing ascii file" <<std::endl;
+		std::string line;
 		while (std::getline(my_file, line)){
 			parseLine( line, coords, tris, re_ar);
 		}

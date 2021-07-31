@@ -14,7 +14,13 @@ Sources for:
 -understanding math behind rotations of points and mapping 3D to 2D: https://www.a1k0n.net/2011/07/20/donut-math.html and https://www.a1k0n.net/2021/01/13/optimizing-donut.html
 -understanding STL file format: https://all3dp.com/what-is-stl-file-format-extension-3d-printing/
 - header file that parses STL files into points and lines: https://github.com/sreiter/stl_reader
+
+============
+TODO:
+	* figure out optimization for loading stl, sth is fucked up there
+	* add sfml support
 */
+
 namespace Engine{
 using Clock = std::chrono::steady_clock;
 struct point{
@@ -244,13 +250,16 @@ void loadStl(std::string name){ //using external library to parse STL file into 
 	auto tic = Clock::now();
         int tris;
         stupidpars::parse_stl(name, coords, tris);
+        point *pts[3];
+	int indexnum;
         for(int i=0;i<tris;i++){
-          point *pts[3];
+	
           for(int j=0;j<3;j++){ //corners
-             if(point::alreadyExists(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2])){
-                 pts[j] = &(point::find(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2]));
+
+             if(point::alreadyExists(coords[i*9+3*j],coords[i*9+3*j+1],coords[i*9+3*j+2])){
+                 pts[j] = &(point::find(coords[i*9+3*j],coords[i*9+3*j+1],coords[i*9+3*j+2]));
              }else{
-                 pts[j] = new Engine::point(coords[i*12+3*j],coords[i*12+3*j+1],coords[i*12+3*j+2]);
+                 pts[j] = new Engine::point(coords[i*9+3*j],coords[i*9+3*j + 1],coords[i*9+3*j + 2]);
              }
         }
           /* Version for SFML, with triangle class;
@@ -329,7 +338,6 @@ void clearMem(){
     line::all_lines.clear();
     point::all_points.clear();
 }
-/*
 void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 hours before project end so its a bit of a hack, not sure if makes any sense and not sure if works
     std::cout<<"Taking a screenshot!";
     std::ofstream screenshot;
@@ -354,5 +362,4 @@ void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 ho
     exit(num);
     }
 
-  */  
 }

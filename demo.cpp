@@ -2,14 +2,14 @@
 #include <cstdlib>
 #include <csignal>
 #include <ctime>
-int main(){//Every run of this shows a random model out of 4 : taurus, cube, tetrohedron, and some random model from my tinkercad. You can also load your own model by calling loadStl() and having file.stl in this folder.
+int main(){
     using namespace std::this_thread;
     using namespace std::chrono_literals;
     using std::chrono::system_clock;
     using namespace Engine;
     Engine::buffer b(150,70);
     loadStl("acube.stl");
-    //centerShape();
+    centerShape();
     resizeForBuffer(b.offsety);
     bool tooBigForLines = false;
     if(Engine::point::all_points.size()>500) tooBigForLines = true;
