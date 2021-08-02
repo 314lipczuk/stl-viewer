@@ -21,14 +21,14 @@ int main(){
       }
       
     if(tooBigForLines){
-      for(int x=0;x<point::all_points.size();x++){
-          b.plot((*point::all_points[x]));
+      for(auto itr = Engine::point::all_points.begin();itr != Engine::point::all_points.end();++itr){
+          b.plot((*(*itr)));
       }
     }
       b.render_basic();
-      for(int x=0;x<point::all_points.size();x++){
-          point::all_points[x]->rotate(1, 3.14/30);
-          point::all_points[x]->rotate(2, 3.14/40);
+      for(auto itr = Engine::point::all_points.begin();itr != Engine::point::all_points.end();++itr){
+         (*itr)->rotate(1, 3.14/30);
+         (*itr)->rotate(2, 3.14/40);
       //    std::cout<<point::all_points[x]->x<<"x "<<point::all_points[x]->y<<"y "<<point::all_points[x]->z<<"z\n";
       }
       sleep_for(150ms);
