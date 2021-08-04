@@ -15,15 +15,21 @@
 Sources for:
 -understanding math behind rotations of points and mapping 3D to 2D: https://www.a1k0n.net/2011/07/20/donut-math.html and https://www.a1k0n.net/2021/01/13/optimizing-donut.html
 -understanding STL file format: https://all3dp.com/what-is-stl-file-format-extension-3d-printing/
-- header file that parses STL files into points and lines: https://github.com/sreiter/stl_reader
 
 ============
-	* figure out optimization for loading stl, sth is fucked up there
+TODO:
 	* add sfml support
 */
 
 namespace Engine{
+void clearScreen(){
+    #ifdef __linux__ 
+        std::system("clear");
+    #elif _WIN32
+        std::system("cls");
+    #endif
 
+}
 using Clock = std::chrono::steady_clock;
 struct point{
 public:
@@ -240,9 +246,6 @@ void buffer::plotline(line l){
     }
 
 void loadStl(std::string name){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
-
-	// with checking on loading: 5/7435ms
-	// without checking on load: 3/10ms	
 	
         std::vector<double> coords;
 	auto tic = Clock::now();
@@ -256,7 +259,6 @@ void loadStl(std::string name){ //using external library to parse STL file into 
           /* Version for SFML, with triangle class;
         new triangle(pts[0],pts[1],pts[2]);
         */
-        //version without triangle class, for barebones ascii
         new line(pts[0],pts[1]);
         new line(pts[0],pts[2]);
         new line(pts[1],pts[2]);
@@ -264,7 +266,7 @@ void loadStl(std::string name){ //using external library to parse STL file into 
         }
 	auto toc= Clock::now();
 	std::cout << "Engine.h -> load_stl() 	Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic).count() <<"\tAll lines size: "<<line::all_lines.size()<<"\t All points size: "<<Engine::point::all_points.size() << std::endl;
-	std::this_thread::sleep_for(std::chrono::seconds(5));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 
 
@@ -294,7 +296,7 @@ void scaleShape(double s_factor){
        }
 }
 
-void moveShape(int x, int y, int z){
+void moveShape(double x, double y, double z){
     for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
        (*itr)->x = (*itr)->x + x;
        (*itr)->y = (*itr)->y + y;
@@ -327,7 +329,6 @@ void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 ho
         sc.plot(*(*itr));
     	}
     }
-
     for(int i=0;i<sc.height;++i){
         for(int j=0;j<sc.width;++j){
             screenshot<<sc.data[i][j];

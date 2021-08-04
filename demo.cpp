@@ -10,10 +10,12 @@ int main(){
     Engine::buffer b(150,70);
     loadStl("acube.stl");
     centerShape();
+    Engine::scaleShape(3);
+    Engine::moveShape(0, 50, 50);
     resizeForBuffer(b.offsety);
     bool tooBigForLines = false;
     if(Engine::point::all_points.size()>500) tooBigForLines = true;
-    for(;;){ // If nothing shows you might want to start it again, it does that sometimes
+    for(;;){
       b.clear();
 
       for(int x=0;x<line::all_lines.size();x++){
@@ -29,9 +31,8 @@ int main(){
       for(auto itr = Engine::point::all_points.begin();itr != Engine::point::all_points.end();++itr){
          (*itr)->rotate(1, 3.14/30);
          (*itr)->rotate(2, 3.14/40);
-      //    std::cout<<point::all_points[x]->x<<"x "<<point::all_points[x]->y<<"y "<<point::all_points[x]->z<<"z\n";
       }
       sleep_for(150ms);
-      system("clear");
+      Engine::clearScreen();
     }
 }
