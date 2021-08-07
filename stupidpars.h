@@ -82,19 +82,23 @@ void parse_binary(std::fstream & my_file, std::vector<float> &coords, int &tris)
 	{
 		uint32_t a;
 		my_file.seekg(80);
-		my_file.read(reinterpret_cast<char *>(&a) , sizeof(a));
+		my_file.read(reinterpret_cast<char *>(&a) , sizeof(a)); // at byte 84
 		std::cout<<a<<std::endl;
-		//myfile.seekg(4)
+    tris = a;
+    //my_file.ignore(4);
 		for(int i = 0; i<a; i++){
-			my_file.seekg(12);
+			my_file.ignore(12);
 			for(int j = 0;j<9;j++){
 				float x;
 				//check if it's even a simple double or is it refactor time
 				my_file.read(reinterpret_cast<char *>(&x), sizeof(x));
 				coords.push_back(x);
 				std::cout<<"push "<<x<<std::endl;
+
 			}
+      my_file.ignore(2);
 		}
+    
 	for(int t=0;t<coords.size()/3;t++){
 		std::cout<<t<<" row: " <<coords[3*t]<<" "<<coords[3*t+1]<<" "<<coords[3*t+2]<<std::endl;
 	}
