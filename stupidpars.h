@@ -15,7 +15,8 @@ namespace stupidpars{
 using Clock = std::chrono::steady_clock;
 bool isAscii(std::fstream &my_file);
 
-void parseLine(std::string &line, std::vector<double>& coords,int& tris, std::regex (&regexes)[3]){
+void parse_binary(std::fstream & my_file, std::vector<float> &coords, int &tris);
+void parseLine(std::string &line, std::vector<float> &coords,int &tris, std::regex (&regexes)[3]){
   std::regex rg("(facet)(.*)");
 	//if (std::regex_match( line, rg )){
 	if (std::regex_match( line, regexes[0] )){
@@ -32,11 +33,9 @@ void parseLine(std::string &line, std::vector<double>& coords,int& tris, std::re
       next++;
 	    }
 	}
-	/*if( std::regex_match( line, std::regex("(.*)(endfacet)(.*)"))){
-		std::cout<<"normal match"<<std::endl;	
-	}*/
+	
 }
-void parse_stl(std::string name, std::vector<double> &coords, int& tris)
+void parse_stl(std::string name, std::vector<float> &coords, int &tris)
 {
 	auto tic = Clock::now();
 	std::regex re_facet("(facet)(.*)");	
@@ -48,6 +47,7 @@ void parse_stl(std::string name, std::vector<double> &coords, int& tris)
 	my_file.open(name, std::ios::binary | std::ios::in);
 	if (!my_file){
 		std::cout<< "File fail"<<std::endl;
+		std::exit(1);
 	}
 	if(isAscii(my_file)){
 		std::cout<< "Parsing ascii file" <<std::endl;
@@ -56,7 +56,9 @@ void parse_stl(std::string name, std::vector<double> &coords, int& tris)
 			parseLine( line, coords, tris, re_ar);
 		}
 	}else{
-	std::cout<< "Parsing binary file" <<std::endl;
+		std::cout<< "Parsing binary file" <<std::endl;
+		parse_binary(my_file,coords, tris );
+		
 	}
 	my_file.close();
 	auto toc = Clock::now();
@@ -76,4 +78,25 @@ bool isAscii(std::fstream &my_file){
 	std::cout<<"regex at call to isAscii() fuckup"<<std::endl;
 	}
 }
+void parse_binary(std::fstream & my_file, std::vector<float> &coords, int &tris)
+	{
+		uint32_t a;
+		my_file.seekg(80);
+		my_file.read(reinterpret_cast<char *>(&a) , sizeof(a));
+		std::cout<<a<<std::endl;
+		//myfile.seekg(4)
+		for(int i = 0; i<a; i++){
+			my_file.seekg(12);
+			for(int j = 0;j<9;j++){
+				float x;
+				//check if it's even a simple double or is it refactor time
+				my_file.read(reinterpret_cast<char *>(&x), sizeof(x));
+				coords.push_back(x);
+				std::cout<<"push "<<x<<std::endl;
+			}
+		}
+	for(int t=0;t<coords.size()/3;t++){
+		std::cout<<t<<" row: " <<coords[3*t]<<" "<<coords[3*t+1]<<" "<<coords[3*t+2]<<std::endl;
+	}
+	}
 }

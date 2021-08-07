@@ -247,15 +247,16 @@ void buffer::plotline(line l){
 
 void loadStl(std::string name){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
 	
-        std::vector<double> coords;
+        std::vector<float> coords;
 	auto tic = Clock::now();
-        int tris;
+        int tris=0;
         stupidpars::parse_stl(name, coords, tris);
         point *pts[3];
         for(int i=0;i<tris;i++){
           for(int j=0;j<3;j++){ //corners
                  pts[j] = new Engine::point(coords[i*9+3*j],coords[i*9+3*j + 1],coords[i*9+3*j + 2]);
         }
+        
           /* Version for SFML, with triangle class;
         new triangle(pts[0],pts[1],pts[2]);
         */

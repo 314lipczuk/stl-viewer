@@ -5,7 +5,7 @@
 #include <ctime>
 int main(){
     Engine::buffer b(150,70);
-    Engine::loadStl("ASCII.stl");
+    Engine::loadStl("examplemodel.stl");
     Engine::centerShape();
     //Engine::scaleShape(3);
     //Engine::moveShape(0, 50, 50);
