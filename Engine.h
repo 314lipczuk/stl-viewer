@@ -22,39 +22,44 @@ TODO:
 */
 
 namespace Engine{
-void clearScreen(){
+void clearScreen()
+  {
     #ifdef __linux__ 
         std::system("clear");
     #elif _WIN32
         std::system("cls");
     #endif
 
-}
+  }
 using Clock = std::chrono::steady_clock;
-struct point{
-public:
-    double x;
-    double y;
-    double z;
-    void rotate(int axisVar, double degrees);
-    point(double x, double y, double z);
-    static point& find(double x, double y, double z);
-    static boost::unordered::unordered_set<point*> all_points;
-    static void add(point);
-    bool operator==(point &spoint){
-	return (x == spoint.x && y == spoint.y && z == spoint.z);
-    	}
-    };
+struct point
+  {
+    public:
+     double x;
+     double y;
+     double z;
+     void rotate(int axisVar, double degrees);
+     point(double x, double y, double z);
+     static point& find(double x, double y, double z);
+     static boost::unordered::unordered_set<point*> all_points;
+     static void add(point);
+     bool operator==(point &spoint)
+      {
+	       return (x == spoint.x && y == spoint.y && z == spoint.z);
+     	}
+  };
 
-size_t hash_value(const point &p){
+size_t hash_value(const point &p)
+  {
     size_t seed =0;
     boost::hash_combine(seed, p.x);
     boost::hash_combine(seed, p.y);
     boost::hash_combine(seed, p.z);
     return seed;
-}
+  }
 boost::unordered_set<point*> point::all_points;
-void point::rotate(int axisVar, double degrees){
+void point::rotate(int axisVar, double degrees)
+  {
     double cos = std::cos(degrees);
     double sin= std::sin(degrees);
     double x = this->x;
@@ -75,13 +80,15 @@ void point::rotate(int axisVar, double degrees){
             break;
       }
     }
-point::point(double x, double y, double z){
+point::point(double x, double y, double z)
+  {
    this->x=x; 
    this->y=y; 
    this->z=z; 
    all_points.insert(this);
-    }
-struct line{
+  }
+struct line
+  {
     point* p1;
     point* p2;
     double normx,normy,normz;
@@ -89,9 +96,10 @@ struct line{
     line(point* p1, point* p2,double nx,double ny, double nz);
     static std::vector<line*> all_lines;
     void draw_all();
-    };
+  };
 
- line::line(point* p1, point* p2,double nx,double ny, double nz){
+line::line(point* p1, point* p2,double nx,double ny, double nz)
+  {
     this->p1 = p1;
     this->p2 = p2;
     this->normx = nx;
@@ -100,11 +108,12 @@ struct line{
     all_lines.push_back(this);
  }
 std::vector<line*> line::all_lines;
-line::line(point* p1, point* p2){
+line::line(point* p1, point* p2)
+  {
     this->p1 = p1;
     this->p2 = p2;
     all_lines.push_back(this);
-    }
+  }
 struct buffer 
     {
     char** data;
@@ -245,25 +254,23 @@ void buffer::plotline(line l){
     this->plotline(*(l.p1),*(l.p2));
     }
 
-void loadStl(std::string name){ //using external library to parse STL file into my own points and lines. Doesn't bother to clean the 'support lines' from stl format and because of that is a bit dirty to look at
-	
+void loadStl(std::string name)
+  { 
         std::vector<float> coords;
-	auto tic = Clock::now();
+	      auto tic = Clock::now();
         int tris=0;
         stupidpars::parse_stl(name, coords, tris);
         point *pts[3];
         for(int i=0;i<tris;i++){
-          for(int j=0;j<3;j++){ //corners
+          for(int j=0;j<3;j++){
                  pts[j] = new Engine::point(coords[i*9+3*j],coords[i*9+3*j + 1],coords[i*9+3*j + 2]);
         }
-        
-          /* Version for SFML, with triangle class;
-        new triangle(pts[0],pts[1],pts[2]);
+        /* Version for SFML, with triangle class;
+          new triangle(pts[0],pts[1],pts[2]);
         */
         new line(pts[0],pts[1]);
         new line(pts[0],pts[2]);
         new line(pts[1],pts[2]);
-
         }
 	auto toc= Clock::now();
 	std::cout << "Engine.h -> load_stl() 	Elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(toc - tic).count() <<"\tAll lines size: "<<line::all_lines.size()<<"\t All points size: "<<Engine::point::all_points.size() << std::endl;
@@ -271,7 +278,8 @@ void loadStl(std::string name){ //using external library to parse STL file into 
 }
 
 
-void centerShape(){
+void centerShape()
+  {
     double averagex= 0,averagey = 0,averagez = 0;
     for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
         averagex+= (*itr)->x;
@@ -287,56 +295,37 @@ void centerShape(){
         (*itr)->y = (*itr)->y - averagey;
         (*itr)->z = (*itr)->z - averagez;
     }
-}
+  }
 
-void scaleShape(double s_factor){
+void scaleShape(double s_factor)
+  {
     for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
        (*itr)->x = (*itr)->x * s_factor;
        (*itr)->y = (*itr)->y * s_factor;
        (*itr)->z = (*itr)->z * s_factor;
        }
-}
+  }
 
-void moveShape(double x, double y, double z){
+void moveShape(double x, double y, double z)
+  {
     for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
        (*itr)->x = (*itr)->x + x;
        (*itr)->y = (*itr)->y + y;
        (*itr)->z = (*itr)->z + z;
     }
-}
-void resizeForBuffer(int bufsiz){
+  }
+void resizeForBuffer(int bufsiz)
+  {
     double max_score =0;
     for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
         double iLen=std::sqrt(std::pow((*itr)->x, 2)+ std::pow((*itr)->y, 2) + std::pow((*itr)->z, 2));
         if(iLen>max_score) max_score = iLen;
     }
     scaleShape( (bufsiz-1) / (max_score) );
-}
-void clearMem(){
+  }
+void clearMem()
+  {
     line::all_lines.clear();
     point::all_points.clear();
-}
-void screenshotSignal(int num){ //Acutally i saw the screenshot requirement 2 hours before project end so its a bit of a hack, not sure if makes any sense and not sure if works
-    std::cout<<"Taking a screenshot!";
-    std::ofstream screenshot;
-    screenshot.open("SC.txt");
-    buffer sc(150,70);
-    if(point::all_points.size()<500){
-    for(int i=0;i<line::all_lines.size();i++){
-        sc.plotline(*line::all_lines[i]);
-    }
-    }else{
-    for(auto itr = point::all_points.begin();itr!=point::all_points.end();++itr){
-        sc.plot(*(*itr));
-    	}
-    }
-    for(int i=0;i<sc.height;++i){
-        for(int j=0;j<sc.width;++j){
-            screenshot<<sc.data[i][j];
-        }
-        screenshot<<'\n';
-    }
-    screenshot.close();
-    exit(num);
-    }
+  }
 }

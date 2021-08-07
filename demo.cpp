@@ -3,9 +3,10 @@
 #include <cstdlib>
 #include <csignal>
 #include <ctime>
-int main(){
+int main()
+  {
     Engine::buffer b(150,70);
-    Engine::loadStl("examplemodel.stl");
+    Engine::loadStl("cube.stl");
     Engine::centerShape();
     //Engine::scaleShape(3);
     //Engine::moveShape(0, 50, 50);
@@ -30,4 +31,4 @@ int main(){
       std::this_thread::sleep_for(std::chrono::milliseconds(150));
       Engine::clearScreen();
     }
-}
+  }
